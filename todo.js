@@ -63,10 +63,11 @@ class Todo {
         this.element.addEventListener("keydown", function (e) {
             if (e.key == "Enter")
                 this.toggleSelect();
-            if (e.key == " ")
+            if (e.key == "Escape")
                 this.toggleEdit();
         }.bind(this));
         this.element.addEventListener("dblclick", this.toggleEdit.bind(this));
+        // Exit editing when the user presses the enter key in the input
         document.addEventListener("keydown", function (event) {
             if ((event.target === this.subElements.title
                 || event.target === this.subElements.body)
