@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Todo</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<template data-todo-template>
+		<div class="todo">
+			<span class="title"></span>
+			<span class="body"></span>
+			<span class="date"></span>
+			<input type="color" class="color-btn"></label>
+		</div>
+	</template>
+
+	<div class="options">
+		<input type="text" data-input="title" placeholder="Title">
+		<input type="text" data-input="body" placeholder="Body">
+		<label for="color" class="color-picker">
+			<input id="color" type="color" data-input="color" value="#317ecc">
+		</label>
+
+		<!-- Dummy div to push the rest to the right -->
+		<div style="margin-left: auto;"></div>
+
+		<button class="select-all" data-input="all">Toggle All</button>
+		<button class="remove" data-input="remove">Remove</button>
+	</div>
+
+	<div class="todos-container"></div>
+</body>
+<script src="todo.js"></script>
+</html>

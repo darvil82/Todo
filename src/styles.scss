@@ -1,0 +1,273 @@
+// the color when the todos are selected
+$color-delete: rgb(177, 77, 77);
+$color-edit: rgb(182, 123, 56);
+
+* {
+	scroll-behavior: smooth;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	scroll-behavior: smooth;
+	scroll-padding-top: 100px;
+	background-color: #000;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: white;
+}
+
+
+
+
+// these are the options shown the top
+	.options {
+		$bg-opacity: .5;
+
+		padding: 1em;
+		display: flex;
+		flex-wrap: wrap;
+		gap: .5em;
+		align-items: center;
+		top: 0;
+		z-index: 9999;
+		background-color: rgba(12, 12, 12, $bg-opacity);
+		backdrop-filter: blur(10px);
+		position: sticky;
+
+		&.error {
+			animation: pulse 1s alternate;
+
+			@keyframes pulse {
+				from {
+					background-color: rgba(100, 40, 40, $bg-opacity);
+				}
+			}
+		}
+	}
+
+	input, .color-picker {
+		color: white;
+		font-size: .9em;
+		background-color: rgb(37, 37, 37);
+		border: none;
+		padding: .5em 1em;
+		border-radius: 5px;
+		box-shadow: inset 0 0 10px -2px black;
+		border: 1px solid rgb(43, 43, 43);
+
+		&[type="color"] {
+			padding: .1em;
+		}
+
+		&.color-picker {
+			padding: .1em;
+
+			input {
+				visibility: hidden;
+			}
+		}
+	}
+
+	button {
+		display: inline-block;
+		background-color: rgb(37, 37, 37);
+
+		border: none;
+		color: white;
+		font-size: 1em;
+		padding: 0.4em 1.75em;
+		border-radius: 5px;
+		font-weight: bold;
+		text-decoration: none;
+		transition:
+			background-color 0.25s,
+			box-shadow 1s,
+			color 0.25s;
+		top: 1em;
+		right: 1em;
+
+		&:hover {
+			background-color: var(--color-hover, rgb(119, 219, 164));
+			box-shadow: 0 0 10px 1px rgba(36, 36, 36, 0.63);
+			color: black;
+			cursor: pointer;
+		}
+
+		&:active, &:focus-visible {
+			background-color: var(--color-active, rgb(206, 255, 228));
+			transition: 0.1s;
+			transform: scale(1.1);
+			color: black;
+		}
+
+
+		&.remove {
+			--color-hover: #d44;
+			--color-active: rgb(236, 218, 218);
+		}
+
+		&.select-all {
+			--color-hover: rgb(219, 221, 68);
+			--color-active: rgb(248, 243, 212);
+		}
+	}
+
+
+
+
+// the element that contains all todos
+.todos-container {
+	display: flex;
+	flex-wrap: wrap;
+	color: white;
+	gap: 1em;
+	margin: 1em;
+}
+
+.todo {
+	// how much distance the todo moves when shaking
+	--shake-anim-offset: .03em;
+	$outline-size: 3px;
+
+	display: flex;
+	gap: .25em;
+	position: relative;
+	flex-direction: column;
+	background-image: linear-gradient(-150deg, #222, var(--bg-color, rgb(68, 202, 146)));
+	background-size: 175%;
+	background-position: right;
+	box-shadow: inset 0 0 70px -5px rgba(0, 0, 0, 0.61);
+	padding: 1em;
+	border-radius: 10px;
+	flex-grow: 1;
+	min-height: 200px;
+	min-width: 20vw;
+	overflow: hidden;
+	z-index: 1;
+	outline: 0 solid transparent;
+	user-select: none;
+	outline-offset: -$outline-size;
+
+	&, * {
+		transition: .5s;
+	}
+
+	.title {
+		font-size: 2.5em;
+		font-weight: bold;
+	}
+
+	.date {
+		color: rgba(255, 255, 255, 0.267);
+		font-size: .75em;
+		font-weight: bold;
+		margin-top: auto;
+		// align-self: flex-end;
+	}
+
+	.body {
+		font-size: 1.25em;
+		color: rgba(255, 255, 255, 0.795);
+	}
+
+	.color-btn {
+		position: absolute;
+		bottom: 1em;
+		right: 1em;
+		top: calc(100% - 3em);
+		transform: translateY(200%);
+		transition: .5s;
+		// we dont want this button to be focusable now
+		visibility: hidden;
+	}
+
+	[contentEditable="true"] {
+		background-image: linear-gradient(90deg, var(--editable-color, rgba(0, 0, 0, 0.479)), transparent);
+		border-radius: 5px;
+		padding: .1em;
+	}
+
+	&.in {
+		animation: slide .5s forwards;
+	}
+
+	&.selected {
+		outline: $outline-size solid $color-delete;
+		background-position: right;
+		--bg-color: #{$color-delete} !important;
+		animation: shake 500ms alternate infinite;
+	}
+
+	&.edit {
+		outline: $outline-size solid $color-edit;
+		background-position: right;
+		--bg-color: #{$color-edit} !important;
+		background-position: left;
+
+		.color-btn {
+			transform: translateY(0);
+			visibility: visible;
+		}
+	}
+
+	&.remove {
+		animation: slide .25s reverse forwards;
+	}
+
+	&.shake {
+		--shake-anim-offset: .25em;
+		animation: shake 350ms alternate;
+
+		.title {
+			--editable-color: rgba(131, 33, 33, 0.479);
+		}
+	}
+
+
+	&:hover, &:focus-visible {
+		cursor: pointer;
+		background-position: left;
+
+		&:focus-visible {
+			outline: 2px solid white;
+		}
+	}
+
+	// this darkens the todo a bit to make it easier to read
+	&::before {
+		z-index: -1;
+		position: absolute;
+		content: "";
+		inset: 0;
+		background-image: linear-gradient(320deg, transparent, rgba(0, 0, 0, 0.486));
+	}
+
+	@keyframes slide {
+		from {
+			transform: translateY(50%) scale(.25);
+			opacity: 0;
+		}
+	}
+
+	@keyframes shake {
+		15% {
+			transform: translate(0, var(--shake-anim-offset));
+		}
+		30% {
+			transform: translate(0, 0)
+		}
+		45% {
+			transform: translate(var(--shake-anim-offset), calc(var(--shake-anim-offset) * -1))
+		}
+		60% {
+			transform: translate(calc(var(--shake-anim-offset) * -1), 0)
+		}
+		75% {
+			transform: translate(0, var(--shake-anim-offset))
+		}
+		90% {
+			transform: translate(var(--shake-anim-offset), var(--shake-anim-offset))
+		}
+	}
+}
