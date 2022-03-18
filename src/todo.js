@@ -113,7 +113,7 @@ class Todo {
     show() {
         // play the animation and remove it after .5s
         this.element.classList.add("in");
-        setTimeout(() => this.element.classList.remove("in"), 500);
+        setTimeout(() => this.element.classList.remove("in"), 750);
         // add the element to the container with all the todos
         container.prepend(this.element);
     }
