@@ -32,8 +32,8 @@ class Todo {
     element;
     _options; // this needs to be private because options should only be changed by the update method
     subElements = {};
-    isEditing = false;
-    isSelected = false;
+    _isEditing = false;
+    _isSelected = false;
     constructor(options) {
         this.element = getTodoTemplate();
         this.element.tabIndex = 0;
@@ -63,23 +63,25 @@ class Todo {
      */
     setEvents() {
         // we want to add the events when the show animation finishes
-        this.element.addEventListener("animationend", function () {
+        this.element.addEventListener("animationend", () => {
             this.element.addEventListener("click", () => this.toggleSelect());
-            this.element.addEventListener("keydown", function (e) {
+            this.element.addEventListener("keydown", (e) => {
                 if (e.key == "Enter")
                     this.toggleSelect();
                 if (e.key == "Escape")
                     this.toggleEdit();
-            }.bind(this));
+            });
             this.element.addEventListener("dblclick", () => this.toggleEdit());
             // Exit editing when the user presses the enter key in the input
-            document.addEventListener("keydown", function (event) {
-                if ((event.target === this.subElements.title
-                    || event.target === this.subElements.body)
-                    && event.key === "Enter")
+            document.addEventListener("keydown", (event) => {
+                if ((event.target === this.subElements.title || event.target === this.subElements.body)
+                    && event.key === "Enter") {
                     this.toggleEdit();
-            }.bind(this));
-        }.bind(this));
+                    // we don't want the user to input newlines
+                    event.preventDefault();
+                }
+            });
+        }, { once: true });
     }
     /**
      * Show the todo in the container
@@ -87,7 +89,7 @@ class Todo {
     show() {
         // play the animation and then remove the animation class after it's done
         this.element.classList.add("in");
-        this.element.addEventListener("animationend", () => this.element.classList.remove("in"));
+        this.element.addEventListener("animationend", () => this.element.classList.remove("in"), { once: true });
         // add the element to the container with all the todos
         container.prepend(this.element);
     }
@@ -98,7 +100,7 @@ class Todo {
         this.element.classList.add("remove");
         currentTodos.splice(currentTodos.indexOf(this), 1);
         // dont remove until "remove" animation ends
-        this.element.addEventListener("animationend", () => this.element.remove());
+        this.element.addEventListener("animationend", () => this.element.remove(), { once: true });
     }
     /**
      * Toggle the todo editing mode
@@ -106,7 +108,7 @@ class Todo {
     toggleEdit(state) {
         // remove the selected state
         this.toggleSelect(false);
-        const isEditing = this.isEditing;
+        const isEditing = this._isEditing;
         /**
          * If the todo is already editing, save the changes and exit editing mode.
          * Note that we only return if:
@@ -119,16 +121,16 @@ class Todo {
         this.element.classList.toggle("edit", state ?? !isEditing);
         [this.subElements.title, this.subElements.body].forEach(e => e.contentEditable = (state ?? !isEditing) ? "true" : "false");
         this.subElements.color.disabled = state ?? isEditing;
-        this.isEditing = state ?? !isEditing;
+        this._isEditing = state ?? !isEditing;
     }
     /**
      * Toggle the todo selection
      */
     toggleSelect(state) {
-        if (this.isEditing)
+        if (this._isEditing)
             return;
-        this.isSelected = state ?? !this.isSelected;
-        this.element.classList.toggle("selected", state ?? this.isSelected);
+        this._isSelected = state ?? !this._isSelected;
+        this.element.classList.toggle("selected", state ?? this._isSelected);
     }
     /**
      * Update the todo using the data from the elements in it
@@ -141,21 +143,14 @@ class Todo {
         ];
         if (!title) {
             this.shake();
-            // we reset the contents to prevent the user from typing newlines
-            this.subElements.title.textContent = title;
-            this.subElements.body.textContent = body;
             return false;
         }
-        this.update({
-            title,
-            body,
-            color
-        });
+        this.update({ title, body, color });
         return true;
     }
     shake() {
         this.element.classList.add("shake");
-        this.element.addEventListener("animationend", () => this.element.classList.remove("shake"));
+        this.element.addEventListener("animationend", () => this.element.classList.remove("shake"), { once: true });
     }
     // -------------------- Setters --------------------
     set title(content) {
@@ -168,8 +163,7 @@ class Todo {
         this.subElements.date.textContent = date.toLocaleString();
     }
     set color(color) {
-        if (!color.startsWith("#"))
-            throw new Error("Color must be in hex format");
+        color = checkHexColor(color);
         this.element.style.setProperty("--bg-color", color);
         this.subElements.color.value = color;
     }
@@ -177,6 +171,12 @@ class Todo {
     get options() {
         // we need to make sure we save the date in the great format... Ugly!
         return { ...this._options, ...{ date: this._options.date.toLocaleString() } };
+    }
+    get isEditing() {
+        return this._isEditing;
+    }
+    get isSelected() {
+        return this._isSelected;
     }
 }
 /**
@@ -202,7 +202,7 @@ function addTodo(options) {
     })) {
         // insertion failed, so we play a "pulse" animation
         optionsBar.classList.add("error");
-        optionsBar.addEventListener("animationend", () => optionsBar.classList.remove("error"));
+        optionsBar.addEventListener("animationend", () => optionsBar.classList.remove("error"), { once: true });
         return;
     }
     // insertion succeeded, so we reset the inputs and scroll up
@@ -236,6 +236,20 @@ function saveTodos() {
  */
 function getTodos() {
     return JSON.parse(localStorage.getItem("todos")) || [];
+}
+/**
+ * Check if a hex color is valid, and return it with a `#rrggbb` format.
+ */
+function checkHexColor(hex) {
+    hex = hex.replaceAll("#", "");
+    if (!/^([\da-f]{3}){1,2}$/.test(hex))
+        throw new TypeError("Invalid hex color");
+    if (hex.length == 3)
+        return "#"
+            + hex.split("")
+                .map(v => `${v}${v}`)
+                .join("");
+    return "#" + hex;
 }
 // Insert the todos from the local storage
 getTodos().forEach(options => addTodo(options));

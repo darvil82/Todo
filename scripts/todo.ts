@@ -51,9 +51,8 @@ class Todo {
 	private element: HTMLDivElement
 	private _options: TodoInfo	// this needs to be private because options should only be changed by the update method
 	private subElements: { [key: string]: any } = {}
-
-	public isEditing: boolean = false
-	public isSelected: boolean = false
+	private _isEditing: boolean = false
+	private _isSelected: boolean = false
 
 
 	constructor(options: TodoInfo) {
@@ -87,26 +86,27 @@ class Todo {
 	 */
 	private setEvents() {
 		// we want to add the events when the show animation finishes
-		this.element.addEventListener("animationend", function() {
+		this.element.addEventListener("animationend", () => {
 			this.element.addEventListener("click", () => this.toggleSelect())
-			this.element.addEventListener("keydown", function(e: KeyboardEvent) {
+			this.element.addEventListener("keydown", (e: KeyboardEvent) => {
 				if (e.key == "Enter") this.toggleSelect()
 				if (e.key == "Escape") this.toggleEdit()
-			}.bind(this))
+			})
 
 			this.element.addEventListener("dblclick", () => this.toggleEdit())
 
 			// Exit editing when the user presses the enter key in the input
-			document.addEventListener("keydown", function(event: KeyboardEvent) {
+			document.addEventListener("keydown", (event: KeyboardEvent) => {
 				if (
-					(
-						event.target === this.subElements.title
-						|| event.target === this.subElements.body
-					)
+					(event.target === this.subElements.title || event.target === this.subElements.body)
 					&& event.key === "Enter"
-				) this.toggleEdit()
-			}.bind(this))
-		}.bind(this))
+				) {
+					this.toggleEdit()
+					// we don't want the user to input newlines
+					event.preventDefault()
+				}
+			})
+		}, { once: true })
 	}
 
 	/**
@@ -115,7 +115,10 @@ class Todo {
 	public show() {
 		// play the animation and then remove the animation class after it's done
 		this.element.classList.add("in")
-		this.element.addEventListener("animationend", () => this.element.classList.remove("in"))
+		this.element.addEventListener("animationend",
+			() => this.element.classList.remove("in"),
+			{ once: true }
+		)
 
 		// add the element to the container with all the todos
 		container.prepend(this.element)
@@ -128,7 +131,10 @@ class Todo {
 		this.element.classList.add("remove")
 		currentTodos.splice(currentTodos.indexOf(this), 1)
 		// dont remove until "remove" animation ends
-		this.element.addEventListener("animationend", () => this.element.remove())
+		this.element.addEventListener("animationend",
+			() => this.element.remove(),
+			{ once: true }
+		)
 	}
 
 	/**
@@ -137,7 +143,7 @@ class Todo {
 	public toggleEdit(state?: boolean) {
 		// remove the selected state
 		this.toggleSelect(false)
-		const isEditing = this.isEditing
+		const isEditing = this._isEditing
 
 		/**
 		 * If the todo is already editing, save the changes and exit editing mode.
@@ -155,16 +161,16 @@ class Todo {
 		)
 		this.subElements.color.disabled = state ?? isEditing
 
-		this.isEditing = state ?? !isEditing
+		this._isEditing = state ?? !isEditing
 	}
 
 	/**
 	 * Toggle the todo selection
 	 */
 	public toggleSelect(state?: boolean) {
-		if (this.isEditing) return
-		this.isSelected = state ?? !this.isSelected
-		this.element.classList.toggle("selected", state ?? this.isSelected)
+		if (this._isEditing) return
+		this._isSelected = state ?? !this._isSelected
+		this.element.classList.toggle("selected", state ?? this._isSelected)
 	}
 
 	/**
@@ -179,24 +185,17 @@ class Todo {
 
 		if (!title) {
 			this.shake()
-			// we reset the contents to prevent the user from typing newlines
-			this.subElements.title.textContent = title
-			this.subElements.body.textContent = body
 			return false
 		}
 
-		this.update({
-			title,
-			body,
-			color
-		})
+		this.update({ title, body, color })
 		return true
 	}
 
 	public shake() {
 		this.element.classList.add("shake")
 		this.element.addEventListener(
-			"animationend", () => this.element.classList.remove("shake")
+			"animationend", () => this.element.classList.remove("shake"), { once: true }
 		)
 	}
 
@@ -215,7 +214,7 @@ class Todo {
 	}
 
 	public set color(color: string) {
-		if (!color.startsWith("#")) throw new Error("Color must be in hex format")
+		color = checkHexColor(color)
 		this.element.style.setProperty("--bg-color", color)
 		this.subElements.color.value = color
 	}
@@ -225,6 +224,14 @@ class Todo {
 	public get options() {
 		// we need to make sure we save the date in the great format... Ugly!
 		return { ...this._options, ...{ date: this._options.date.toLocaleString() } }
+	}
+
+	public get isEditing() {
+		return this._isEditing
+	}
+
+	public get isSelected() {
+		return this._isSelected
 	}
 }
 
@@ -255,8 +262,9 @@ function addTodo(options: TodoInfo) {
 		})) {
 			// insertion failed, so we play a "pulse" animation
 			optionsBar.classList.add("error")
-			optionsBar.addEventListener("animationend", () =>
-				optionsBar.classList.remove("error")
+			optionsBar.addEventListener("animationend",
+				() => optionsBar.classList.remove("error"),
+				{ once: true }
 			)
 			return
 		}
@@ -307,6 +315,25 @@ function saveTodos() {
  */
 function getTodos(): TodoInfo[] {
 	return JSON.parse(localStorage.getItem("todos")) || []
+}
+
+
+/**
+ * Check if a hex color is valid, and return it with a `#rrggbb` format.
+ */
+function checkHexColor(hex: string): string {
+	hex = hex.replaceAll("#", "")
+
+	if (!/^([\da-f]{3}){1,2}$/.test(hex))
+		throw new TypeError("Invalid hex color")
+
+	if (hex.length == 3)
+		return "#"
+			+ hex.split("")
+			.map(v => `${v}${v}`)
+			.join("")
+
+	return "#" + hex
 }
 
 

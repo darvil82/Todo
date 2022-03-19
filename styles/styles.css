@@ -286,6 +286,7 @@ button.select-all {
   border-left: 10vh solid transparent;
   transform: rotate(90deg);
   z-index: 9999;
+  pointer-events: none;
 }
 .github-label img {
   width: 3.3333333333vh;
@@ -293,4 +294,5 @@ button.select-all {
   right: 5vh;
   bottom: 5vh;
   transform: rotate(-90deg) translate(10%, 110%);
+  pointer-events: all;
 }/*# sourceMappingURL=styles.css.map */

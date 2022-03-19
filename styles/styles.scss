@@ -301,6 +301,7 @@ body {
 	border-left: $size solid transparent;
 	transform: rotate(90deg);
 	z-index: 9999;
+	pointer-events: none;
 
 	img {
 		width: calc($size / 3);
@@ -308,5 +309,6 @@ body {
 		right: calc($size / 2);
 		bottom: calc($size / 2);
 		transform: rotate(-90deg) translate(10%, 110%);
+		pointer-events: all;
 	}
 }
