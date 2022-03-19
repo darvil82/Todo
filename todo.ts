@@ -86,13 +86,13 @@ class Todo {
 	 * Set the events for the todo
 	 */
 	private setEvents() {
-		this.element.addEventListener("click", this.toggleSelect.bind(this))
+		this.element.addEventListener("click", () => this.toggleSelect())
 		this.element.addEventListener("keydown", function(e: KeyboardEvent) {
 			if (e.key == "Enter") this.toggleSelect()
 			if (e.key == "Escape") this.toggleEdit()
 		}.bind(this))
 
-		this.element.addEventListener("dblclick", this.toggleEdit.bind(this))
+		this.element.addEventListener("dblclick", () => this.toggleEdit())
 
 		// Exit editing when the user presses the enter key in the input
 		document.addEventListener("keydown", function(event: KeyboardEvent) {
@@ -119,32 +119,37 @@ class Todo {
 	/**
 	 * Toggle the todo editing mode
 	 */
-	public toggleEdit() {
-		// remove the selected class
-		this.element.classList.remove("selected")
+	public toggleEdit(state?: boolean) {
+		// remove the selected state
+		this.toggleSelect(false)
 		const isEditing = this.isEditing
 
-		if (isEditing) {
-			if (!this.updateFromElements()) return;
-		}
+		/**
+		 * If the todo is already editing, save the changes and exit editing mode.
+		 * Note that we only return if:
+		 * 	- we are editing
+		 *  - the state is falsy
+		 *  - updateFromElements returned false
+		 */
+		if (isEditing && !state && !this.updateFromElements()) return
 
-		this.element.classList.toggle("edit", !isEditing);
+		this.element.classList.toggle("edit", state ?? !isEditing);
 
 		[this.subElements.title, this.subElements.body].forEach(
-			e => e.contentEditable = isEditing ? "false" : "true"
+			e => e.contentEditable = (state ?? !isEditing) ? "true" : "false"
 		)
-		this.subElements.color.disabled = isEditing
+		this.subElements.color.disabled = state ?? isEditing
 
-		this.isEditing = !isEditing
+		this.isEditing = state ?? !isEditing
 	}
 
 	/**
 	 * Toggle the todo selection
 	 */
-	public toggleSelect() {
+	public toggleSelect(state?: boolean) {
 		if (this.isEditing) return
-		this.element.classList.toggle("selected")
-		this.isSelected = !this.isSelected
+		this.isSelected = state ?? !this.isSelected
+		this.element.classList.toggle("selected", state ?? this.isSelected)
 	}
 
 	/**
