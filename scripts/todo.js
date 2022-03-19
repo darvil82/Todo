@@ -62,21 +62,34 @@ class Todo {
      * Set the events for the todo
      */
     setEvents() {
-        this.element.addEventListener("click", () => this.toggleSelect());
-        this.element.addEventListener("keydown", function (e) {
-            if (e.key == "Enter")
-                this.toggleSelect();
-            if (e.key == "Escape")
-                this.toggleEdit();
+        // we want to add the events when the show animation finishes
+        this.element.addEventListener("animationend", function () {
+            this.element.addEventListener("click", () => this.toggleSelect());
+            this.element.addEventListener("keydown", function (e) {
+                if (e.key == "Enter")
+                    this.toggleSelect();
+                if (e.key == "Escape")
+                    this.toggleEdit();
+            }.bind(this));
+            this.element.addEventListener("dblclick", () => this.toggleEdit());
+            // Exit editing when the user presses the enter key in the input
+            document.addEventListener("keydown", function (event) {
+                if ((event.target === this.subElements.title
+                    || event.target === this.subElements.body)
+                    && event.key === "Enter")
+                    this.toggleEdit();
+            }.bind(this));
         }.bind(this));
-        this.element.addEventListener("dblclick", () => this.toggleEdit());
-        // Exit editing when the user presses the enter key in the input
-        document.addEventListener("keydown", function (event) {
-            if ((event.target === this.subElements.title
-                || event.target === this.subElements.body)
-                && event.key === "Enter")
-                this.toggleEdit();
-        }.bind(this));
+    }
+    /**
+     * Show the todo in the container
+     */
+    show() {
+        // play the animation and then remove the animation class after it's done
+        this.element.classList.add("in");
+        this.element.addEventListener("animationend", () => this.element.classList.remove("in"));
+        // add the element to the container with all the todos
+        container.prepend(this.element);
     }
     /**
      * Remove the todo
@@ -116,16 +129,6 @@ class Todo {
             return;
         this.isSelected = state ?? !this.isSelected;
         this.element.classList.toggle("selected", state ?? this.isSelected);
-    }
-    /**
-     * Show the todo in the container
-     */
-    show() {
-        // play the animation and remove it after .5s
-        this.element.classList.add("in");
-        setTimeout(() => this.element.classList.remove("in"), 750);
-        // add the element to the container with all the todos
-        container.prepend(this.element);
     }
     /**
      * Update the todo using the data from the elements in it
