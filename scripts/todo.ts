@@ -75,8 +75,7 @@ class Todo {
 	 * Update the todo with the given options
 	 */
 	private update(options: TodoInfo, autoSave: boolean = true) {
-		Object.entries(options)
-			.forEach(function([key, value]) { this[key] = value }, this)
+		Object.entries(options).forEach(([key, value]) => this[key] = value)
 		this._options = { ...this._options, ...options}
 		if (autoSave) saveTodos()
 	}
