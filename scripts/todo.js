@@ -212,8 +212,16 @@ function addTodo(options) {
 }));
 // Remove all the selected todos
 opts.delButton.addEventListener("click", () => {
-    currentTodos.filter(t => t.isSelected).forEach(t => t.remove());
-    saveTodos();
+    const todos = currentTodos.filter(t => t.isSelected);
+    // if we have more than 25 todos, just dont do any fancy delaying
+    if (todos.length > 25) {
+        todos.forEach(t => t.remove());
+        saveTodos();
+        return;
+    }
+    todos.reverse().forEach((todo, i) => setTimeout(() => todo.remove(), i * (250 / todos.length)));
+    // wait for all the todos to remove before saving
+    setTimeout(() => saveTodos(), todos.length * (250 / todos.length));
 });
 // Toggle the selected class of all the todos
 opts.allButton.addEventListener("click", () => {
