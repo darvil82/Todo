@@ -322,7 +322,7 @@ function getTodos(): TodoInfo[] {
  * Check if a hex color is valid, and return it with a `#rrggbb` format.
  */
 function checkHexColor(hex: string): string {
-	hex = hex.replaceAll("#", "")
+	hex = hex.replaceAll("#", "").toLowerCase()
 
 	if (!/^([\da-f]{3}){1,2}$/.test(hex))
 		throw new TypeError("Invalid hex color")
