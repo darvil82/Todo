@@ -23,11 +23,19 @@ body {
   top: 0;
   z-index: 9999;
   background-color: rgba(12, 12, 12, 0.5);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  position: -webkit-sticky;
   position: sticky;
 }
 .options.error {
-  animation: pulse 1s alternate;
+  -webkit-animation: pulse 1s alternate;
+          animation: pulse 1s alternate;
+}
+@-webkit-keyframes pulse {
+  from {
+    background-color: rgba(100, 40, 40, 0.5);
+  }
 }
 @keyframes pulse {
   from {
@@ -116,7 +124,10 @@ button.select-all {
   overflow: hidden;
   z-index: 1;
   outline: 0 solid transparent;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   outline-offset: -3px;
 }
 .todo, .todo * {
@@ -151,13 +162,15 @@ button.select-all {
   padding: 0.1em;
 }
 .todo.in {
-  animation: slide 0.5s forwards;
+  -webkit-animation: slide 0.5s forwards;
+          animation: slide 0.5s forwards;
 }
 .todo.selected {
   outline: 3px solid #b14d4d;
   background-position: right;
   --bg-color: #b14d4d !important;
-  animation: shake 500ms alternate infinite;
+  -webkit-animation: shake 500ms alternate infinite;
+          animation: shake 500ms alternate infinite;
 }
 .todo.edit {
   outline: 3px solid #b67b38;
@@ -174,7 +187,8 @@ button.select-all {
 }
 .todo.shake {
   --shake-anim-offset: .25em;
-  animation: shake 350ms alternate;
+  -webkit-animation: shake 350ms alternate;
+          animation: shake 350ms alternate;
 }
 .todo.shake .title {
   --editable-color: rgba(131, 33, 33, 0.479);
@@ -193,10 +207,36 @@ button.select-all {
   inset: 0;
   background-image: linear-gradient(320deg, transparent, rgba(0, 0, 0, 0.486));
 }
+@-webkit-keyframes slide {
+  from {
+    transform: translateY(50%) scale(0.25);
+    opacity: 0;
+  }
+}
 @keyframes slide {
   from {
     transform: translateY(50%) scale(0.25);
     opacity: 0;
+  }
+}
+@-webkit-keyframes shake {
+  15% {
+    transform: translate(0, var(--shake-anim-offset));
+  }
+  30% {
+    transform: translate(0, 0);
+  }
+  45% {
+    transform: translate(var(--shake-anim-offset), calc(var(--shake-anim-offset) * -1));
+  }
+  60% {
+    transform: translate(calc(var(--shake-anim-offset) * -1), 0);
+  }
+  75% {
+    transform: translate(0, var(--shake-anim-offset));
+  }
+  90% {
+    transform: translate(var(--shake-anim-offset), var(--shake-anim-offset));
   }
 }
 @keyframes shake {
@@ -218,6 +258,4 @@ button.select-all {
   90% {
     transform: translate(var(--shake-anim-offset), var(--shake-anim-offset));
   }
-}
-
-/*# sourceMappingURL=styles.css.map */
+}/*# sourceMappingURL=styles.css.map */
