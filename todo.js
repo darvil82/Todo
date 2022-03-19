@@ -29,9 +29,12 @@ const defaultOptions = {
  */
 const currentTodos = [];
 class Todo {
+    element;
+    _options; // this needs to be private because options should only be changed by the update method
+    subElements = {};
+    isEditing = false;
+    isSelected = false;
     constructor(options) {
-        this.isEditing = false;
-        this.subElements = {};
         this.element = getTodoTemplate();
         this.element.tabIndex = 0;
         this.subElements = {
@@ -107,6 +110,7 @@ class Todo {
         if (this.isEditing)
             return;
         this.element.classList.toggle("selected");
+        this.isSelected = !this.isSelected;
     }
     /**
      * Show the todo in the container
@@ -162,9 +166,6 @@ class Todo {
         this.subElements.color.value = color;
     }
     // -------------------- Getters --------------------
-    get isSelected() {
-        return this.element.classList.contains("selected");
-    }
     get options() {
         // we need to make sure we save the date in the great format... Ugly!
         return { ...this._options, ...{ date: this._options.date.toLocaleString() } };

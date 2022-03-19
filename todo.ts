@@ -50,8 +50,10 @@ const currentTodos: Todo[] = []
 class Todo {
 	private element: HTMLDivElement
 	private _options: TodoInfo	// this needs to be private because options should only be changed by the update method
-	private isEditing: boolean = false
 	private subElements: { [key: string]: any } = {}
+
+	public isEditing: boolean = false
+	public isSelected: boolean = false
 
 
 	constructor(options: TodoInfo) {
@@ -142,6 +144,7 @@ class Todo {
 	public toggleSelect() {
 		if (this.isEditing) return
 		this.element.classList.toggle("selected")
+		this.isSelected = !this.isSelected
 	}
 
 	/**
@@ -211,10 +214,6 @@ class Todo {
 
 
 	// -------------------- Getters --------------------
-	public get isSelected() {
-		return this.element.classList.contains("selected")
-	}
-
 	public get options() {
 		// we need to make sure we save the date in the great format... Ugly!
 		return { ...this._options, ...{ date: this._options.date.toLocaleString() } }
