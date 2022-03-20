@@ -16,12 +16,12 @@ body {
 
 ::-webkit-scrollbar {
   background-color: transparent;
-  width: 14px;
+  width: 1.5vh;
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 1vh;
-  border: 4px solid transparent;
+  border-radius: 100vh;
+  border: 0.5vh solid transparent;
   background-clip: padding-box;
   background-color: #747474;
 }
