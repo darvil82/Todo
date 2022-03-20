@@ -34,6 +34,7 @@ body {
   padding: 1em;
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   gap: 0.5em;
   align-items: center;
   top: 0;
@@ -43,6 +44,9 @@ body {
           backdrop-filter: blur(10px);
   position: -webkit-sticky;
   position: sticky;
+}
+.options * {
+  margin-block: 0.1em;
 }
 .options.error {
   -webkit-animation: pulse 1s alternate;
@@ -69,13 +73,13 @@ input, .color-picker {
   box-shadow: inset 0 0 10px -2px black;
   border: 1px solid #2b2b2b;
 }
-input[type=color], .color-picker[type=color] {
-  padding: 0.1em;
-}
 input.color-picker, .color-picker.color-picker {
-  padding: 0.1em;
+  padding-inline: 0;
 }
-input.color-picker input, .color-picker.color-picker input {
+input[type=color], .color-picker[type=color] {
+  padding: 0;
+}
+input input, .color-picker input {
   visibility: hidden;
 }
 
@@ -88,10 +92,7 @@ button {
   padding: 0.4em 1.75em;
   border-radius: 5px;
   font-weight: bold;
-  text-decoration: none;
   transition: background-color 0.25s, box-shadow 1s, color 0.25s;
-  top: 1em;
-  right: 1em;
 }
 button:hover {
   background-color: var(--color-hover, #77dba4);
@@ -106,11 +107,11 @@ button:active, button:focus-visible {
   color: black;
 }
 button.remove {
-  --color-hover: #d44;
+  --color-hover: rgb(219, 109, 109);
   --color-active: rgb(236, 218, 218);
 }
 button.select-all {
-  --color-hover: rgb(219, 221, 68);
+  --color-hover: rgb(216, 218, 99);
   --color-active: rgb(248, 243, 212);
 }
 
@@ -144,6 +145,7 @@ button.select-all {
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
+  outline: 3px solid rgba(255, 255, 255, 0.04);
   outline-offset: -3px;
 }
 .todo, .todo * {
@@ -182,14 +184,14 @@ button.select-all {
           animation: slide 0.5s forwards;
 }
 .todo.selected {
-  outline: 3px solid #b14d4d;
+  outline-color: #b14d4d;
   background-position: right;
   --bg-color: #b14d4d !important;
   -webkit-animation: shake 500ms alternate infinite;
           animation: shake 500ms alternate infinite;
 }
 .todo.edit {
-  outline: 3px solid #b67b38;
+  outline-color: #b67b38;
   background-position: right;
   --bg-color: #b67b38 !important;
   background-position: left;

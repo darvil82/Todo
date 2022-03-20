@@ -11,11 +11,9 @@ const container = document.querySelector(".todos-container");
 // Options bar and it's inputs/buttons (opts)
 const optionsBar = document.querySelector(".options");
 const opts = {
-    inputTitle: document.querySelector("[data-input='title']"),
-    inputBody: document.querySelector("[data-input='body']"),
-    inputColor: document.querySelector("[data-input='color']"),
-    delButton: document.querySelector("[data-input='remove']"),
-    allButton: document.querySelector("[data-input='all']")
+    addButton: document.querySelector("[data-button='add']"),
+    delButton: document.querySelector("[data-button='remove']"),
+    allButton: document.querySelector("[data-button='all']")
 };
 [];
 const defaultOptions = {
@@ -120,6 +118,7 @@ class Todo {
         this.element.classList.toggle("edit", state ?? !isEditing);
         [this.subElements.title, this.subElements.body].forEach(e => e.contentEditable = (state ?? !isEditing) ? "true" : "false");
         this.subElements.color.disabled = state ?? isEditing;
+        this.subElements.title.focus();
         this._isEditing = state ?? !isEditing;
     }
     /**
@@ -188,30 +187,22 @@ function addTodo(options) {
     new Todo(options);
     return true;
 }
-// Handle the inputs on the options bar
-[opts.inputTitle, opts.inputBody].forEach(input => input.addEventListener("keyup", (event) => {
-    if (event.key != "Enter")
-        return;
-    const title = opts.inputTitle.value.trim();
-    if (!addTodo({
-        title,
-        body: opts.inputBody.value,
-        color: opts.inputColor.value,
-        date: new Date()
-    })) {
-        // insertion failed, so we play a "pulse" animation
-        optionsBar.classList.add("error");
-        optionsBar.addEventListener("animationend", () => optionsBar.classList.remove("error"), { once: true });
-        return;
-    }
-    // insertion succeeded, so we reset the inputs and scroll up
+// Handle the "Add" button
+opts.addButton.addEventListener("click", () => {
+    addTodo({
+        title: "New Todo",
+        color: randomColor(),
+    });
     scrollTo(0, 0);
-    [opts.inputTitle, opts.inputBody].forEach(e => e.value = "");
     saveTodos();
-}));
+});
 // Remove all the selected todos
 opts.delButton.addEventListener("click", () => {
     const todos = currentTodos.filter(t => t.isSelected);
+    if (!todos.length) {
+        optionsBarError();
+        return;
+    }
     // if we have more than 25 todos, just dont do any fancy delaying
     if (todos.length > 25) {
         todos.forEach(t => t.remove());
@@ -224,6 +215,10 @@ opts.delButton.addEventListener("click", () => {
 });
 // Toggle the selected class of all the todos
 opts.allButton.addEventListener("click", () => {
+    if (!currentTodos.length) {
+        optionsBarError();
+        return;
+    }
     // if we have more than 25 todos, just dont do any fancy delaying
     if (currentTodos.length > 25) {
         currentTodos.forEach(t => t.toggleSelect());
@@ -258,6 +253,15 @@ function checkHexColor(hex) {
                 .join("");
     return "#" + hex;
 }
+/** Get a random hex color. */
+function randomColor() {
+    return "#" + Math.random().toString(16).slice(2, 8);
+}
+/** Play a pulse error animation on the options bar */
+function optionsBarError() {
+    optionsBar.classList.add("error");
+    optionsBar.addEventListener("animationend", () => optionsBar.classList.remove("error"), { once: true });
+}
 // Insert the todos from the local storage
 getTodos().forEach(options => addTodo(options));
 saveTodos();
@@ -265,9 +269,10 @@ saveTodos();
 if (!currentTodos.length) {
     addTodo({
         title: "Another note",
-        body: `Adding a todo is simple! Just type the contents up there and press enter.
-		Editing them? Even easier! Just double click on any todo to enable the edit mode.
-		Once finished, double click again!`,
+        body: `Do you want to edit a Todo? Cool! Just double click on it to
+		enable the edit mode. Once finished, double click again!
+		If you prefer using the keyboard, that's fine! Press "Enter" to select
+		a it, and "Escape" to edit it.`,
         color: "#483cb5",
     });
     addTodo({

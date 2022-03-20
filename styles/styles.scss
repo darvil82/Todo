@@ -42,6 +42,7 @@ body {
 		padding: 1em;
 		display: flex;
 		flex-wrap: wrap;
+		justify-content: space-between;
 		gap: .5em;
 		align-items: center;
 		top: 0;
@@ -49,6 +50,10 @@ body {
 		background-color: rgba(12, 12, 12, $bg-opacity);
 		backdrop-filter: blur(10px);
 		position: sticky;
+
+		* {
+			margin-block: .1em;
+		}
 
 		&.error {
 			animation: pulse 1s alternate;
@@ -71,36 +76,32 @@ body {
 		box-shadow: inset 0 0 10px -2px black;
 		border: 1px solid rgb(43, 43, 43);
 
-		&[type="color"] {
-			padding: .1em;
+		&.color-picker {
+			padding-inline: 0;
 		}
 
-		&.color-picker {
-			padding: .1em;
+		&[type=color] {
+			padding: 0;
+		}
 
-			input {
-				visibility: hidden;
-			}
+		input {
+			visibility: hidden;
 		}
 	}
 
 	button {
 		display: inline-block;
 		background-color: rgb(37, 37, 37);
-
 		border: none;
 		color: white;
 		font-size: 1em;
 		padding: 0.4em 1.75em;
 		border-radius: 5px;
 		font-weight: bold;
-		text-decoration: none;
 		transition:
 			background-color 0.25s,
 			box-shadow 1s,
 			color 0.25s;
-		top: 1em;
-		right: 1em;
 
 		&:hover {
 			background-color: var(--color-hover, rgb(119, 219, 164));
@@ -118,12 +119,12 @@ body {
 
 
 		&.remove {
-			--color-hover: #d44;
+			--color-hover: rgb(219, 109, 109);
 			--color-active: rgb(236, 218, 218);
 		}
 
 		&.select-all {
-			--color-hover: rgb(219, 221, 68);
+			--color-hover: rgb(216, 218, 99);
 			--color-active: rgb(248, 243, 212);
 		}
 	}
@@ -162,6 +163,7 @@ body {
 	z-index: 1;
 	outline: 0 solid transparent;
 	user-select: none;
+	outline: $outline-size solid rgba(255, 255, 255, 0.040);
 	outline-offset: -$outline-size;
 
 	&, * {
@@ -208,14 +210,14 @@ body {
 	}
 
 	&.selected {
-		outline: $outline-size solid $color-delete;
+		outline-color: $color-delete;
 		background-position: right;
 		--bg-color: #{$color-delete} !important;
 		animation: shake 500ms alternate infinite;
 	}
 
 	&.edit {
-		outline: $outline-size solid $color-edit;
+		outline-color: $color-edit;
 		background-position: right;
 		--bg-color: #{$color-edit} !important;
 		background-position: left;

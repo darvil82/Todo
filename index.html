@@ -18,24 +18,18 @@
 	</template>
 
 	<div class="options">
-		<input type="text" data-input="title" placeholder="Title">
-		<input type="text" data-input="body" placeholder="Body">
-		<label for="color" class="color-picker">
-			<input id="color" type="color" data-input="color" value="#317ecc">
-		</label>
-
-		<!-- Dummy div to push the rest to the right -->
-		<div style="margin-left: auto;"></div>
-
-		<button class="select-all" data-input="all">Toggle All</button>
-		<button class="remove" data-input="remove">Remove</button>
+		<div>
+			<button class="select-all" data-button="all">Toggle All</button>
+			<button class="remove" data-button="remove">Remove</button>
+			<button class="add" data-button="add">Add</button>
+		</div>
 	</div>
 
 	<div class="todos-container"></div>
 
 	<div class="github-label">
 		<a target="_blank" href="https://github.com/DarviL82/Todo">
-			<img src="images/GitHub-Mark-32px.png" alt="github-logo">
+			<img src="images/GitHub-Mark-64px.png" alt="github-logo">
 		</a>
 	</div>
 </body>
