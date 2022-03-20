@@ -51,6 +51,7 @@ class Todo {
 	private element: HTMLDivElement
 	private _options: TodoInfo	// this needs to be private because options should only be changed by the update method
 	private subElements: { [key: string]: any } = {}
+	private _isShown: boolean = false
 	private _isEditing: boolean = false
 	private _isSelected: boolean = false
 
@@ -115,7 +116,10 @@ class Todo {
 		// play the animation and then remove the animation class after it's done
 		this.element.classList.add("in")
 		this.element.addEventListener("animationend",
-			() => this.element.classList.remove("in"),
+			() => {
+				this.element.classList.remove("in")
+				this._isShown = true
+			},
 			{ once: true }
 		)
 
@@ -168,7 +172,7 @@ class Todo {
 	 * Toggle the todo selection
 	 */
 	public toggleSelect(state?: boolean) {
-		if (this._isEditing) return
+		if (this._isEditing || !this._isShown) return
 		this._isSelected = state ?? !this._isSelected
 		this.element.classList.toggle("selected", state ?? this._isSelected)
 	}

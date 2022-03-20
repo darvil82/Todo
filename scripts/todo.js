@@ -32,6 +32,7 @@ class Todo {
     element;
     _options; // this needs to be private because options should only be changed by the update method
     subElements = {};
+    _isShown = false;
     _isEditing = false;
     _isSelected = false;
     constructor(options) {
@@ -88,7 +89,10 @@ class Todo {
     show() {
         // play the animation and then remove the animation class after it's done
         this.element.classList.add("in");
-        this.element.addEventListener("animationend", () => this.element.classList.remove("in"), { once: true });
+        this.element.addEventListener("animationend", () => {
+            this.element.classList.remove("in");
+            this._isShown = true;
+        }, { once: true });
         // add the element to the container with all the todos
         container.prepend(this.element);
     }
@@ -127,7 +131,7 @@ class Todo {
      * Toggle the todo selection
      */
     toggleSelect(state) {
-        if (this._isEditing)
+        if (this._isEditing || !this._isShown)
             return;
         this._isSelected = state ?? !this._isSelected;
         this.element.classList.toggle("selected", state ?? this._isSelected);
