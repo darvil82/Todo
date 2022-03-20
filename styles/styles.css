@@ -160,6 +160,7 @@ button.select-all {
   font-size: 0.75em;
   font-weight: bold;
   margin-top: auto;
+  padding-top: 1em;
 }
 .todo .body {
   font-size: 1.25em;

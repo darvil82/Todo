@@ -368,7 +368,7 @@ if (!currentTodos.length) {
 		body: `Do you want to edit a Todo? Cool! Just double click on it to
 		enable the edit mode. Once finished, double click again!
 		If you prefer using the keyboard, that's fine! Press "Enter" to select
-		a it, and "Escape" to edit it.`,
+		it, and "Escape" to edit it.`,
 		color: "#483cb5",
 	})
 	addTodo({
