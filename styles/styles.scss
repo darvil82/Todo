@@ -51,7 +51,7 @@ body {
 		backdrop-filter: blur(10px);
 		position: sticky;
 
-		* {
+		> * {
 			margin-block: .1em;
 		}
 
@@ -60,7 +60,7 @@ body {
 
 			@keyframes pulse {
 				from {
-					background-color: rgba(100, 40, 40, $bg-opacity);
+					background-color: rgb(100, 40, 40);
 				}
 			}
 		}
@@ -94,8 +94,8 @@ body {
 		background-color: rgb(37, 37, 37);
 		border: none;
 		color: white;
-		font-size: 1em;
-		padding: 0.4em 1.75em;
+		font-size: 1.5em;
+		padding: 0.20em 1em;
 		border-radius: 5px;
 		font-weight: bold;
 		transition:
@@ -126,6 +126,16 @@ body {
 		&.select-all {
 			--color-hover: rgb(216, 218, 99);
 			--color-active: rgb(248, 243, 212);
+		}
+
+		&.import {
+			--color-hover: rgb(109, 219, 109);
+			--color-active: rgb(212, 243, 212);
+		}
+
+		&.export {
+			--color-hover: rgb(109, 109, 219);
+			--color-active: rgb(212, 212, 243);
 		}
 	}
 

@@ -16,7 +16,9 @@ const optionsBar = document.querySelector(".options")
 const opts = {
 	addButton: document.querySelector("[data-button='add']") as HTMLButtonElement,
 	delButton: document.querySelector("[data-button='remove']") as HTMLButtonElement,
-	allButton: document.querySelector("[data-button='all']") as HTMLButtonElement
+	allButton: document.querySelector("[data-button='all']") as HTMLButtonElement,
+	importButton: document.querySelector("[data-button='import']") as HTMLButtonElement,
+	exportButton: document.querySelector("[data-button='export']") as HTMLButtonElement,
 }
 
 type HEXColor = String
@@ -245,6 +247,111 @@ function addTodo(options: TodoInfo) {
 }
 
 
+/**
+ * Save the current todos to the local storage
+ */
+function saveTodos() {
+	localStorage.setItem(
+		"todos",
+		JSON.stringify(currentTodos.map(t => t.options))
+	)
+	console.log("Saved todos: ", currentTodos)
+}
+
+
+/**
+ * Load the todos from the local storage and return them
+ */
+function getTodos(): TodoInfo[] {
+	return JSON.parse(localStorage.getItem("todos")) || []
+}
+
+
+/**
+ * Check if a hex color is valid, and return it with a `#rrggbb` format.
+ */
+function checkHexColor(hex: string): string {
+	hex = hex.replaceAll("#", "").toLowerCase()
+
+	if (!/^([\da-f]{3}){1,2}$/.test(hex))
+		throw new TypeError("Invalid hex color")
+
+	if (hex.length == 3)
+		return "#"
+			+ hex.split("")
+			.map(v => `${v}${v}`)
+			.join("")
+
+	return "#" + hex
+}
+
+
+/** Get a random hex color. */
+function randomColor() {
+	return "#" + Math.random().toString(16).slice(2, 8)
+}
+
+
+/** Play a pulse error animation on the options bar */
+function optionsBarError() {
+	optionsBar.classList.add("error")
+	optionsBar.addEventListener("animationend",
+		() => optionsBar.classList.remove("error"),
+		{ once: true }
+	)
+}
+
+
+function downloadFile(filename: string, data: string) {
+	const element = document.createElement("a")
+	element.setAttribute("href", `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`)
+	element.setAttribute("download", filename)
+	element.style.display = "none"
+	document.body.appendChild(element)
+	element.click()
+	document.body.removeChild(element)
+}
+
+
+function exportTodos() {
+	const todos = currentTodos.map(t => t.options)
+	downloadFile("todos.todos", JSON.stringify(todos))
+}
+
+
+function importTodos() {
+	const input = document.createElement("input")
+	input.type = "file"
+	input.accept = ".todos"
+	input.addEventListener("change", () => {
+		const file = input.files[0]
+		if (!file) return
+
+		const reader = new FileReader()
+		reader.addEventListener("load", () => {
+			const data = reader.result
+			if (typeof data !== "string") return
+
+			try {
+				const todos = JSON.parse(data)
+				if (!Array.isArray(todos)) return
+
+				todos.forEach(t => addTodo(t))
+				saveTodos()
+			} catch (e) {
+				console.error(e)
+				optionsBarError()
+			}
+		})
+		reader.readAsText(file)
+	})
+	input.click()
+	input.remove()
+}
+
+
+
+
 // Handle the "Add" button
 opts.addButton.addEventListener("click", () => {
 	addTodo({
@@ -300,59 +407,12 @@ opts.allButton.addEventListener("click", () => {
 })
 
 
-/**
- * Save the current todos to the local storage
- */
-function saveTodos() {
-	localStorage.setItem(
-		"todos",
-		JSON.stringify(currentTodos.map(t => t.options))
-	)
-	console.log("Saved todos: ", currentTodos)
-}
+// Import a file
+opts.importButton.addEventListener("click", () => importTodos())
 
+// Export a file
+opts.exportButton.addEventListener("click", () => exportTodos())
 
-/**
- * Load the todos from the local storage and return them
- */
-function getTodos(): TodoInfo[] {
-	return JSON.parse(localStorage.getItem("todos")) || []
-}
-
-
-/**
- * Check if a hex color is valid, and return it with a `#rrggbb` format.
- */
-function checkHexColor(hex: string): string {
-	hex = hex.replaceAll("#", "").toLowerCase()
-
-	if (!/^([\da-f]{3}){1,2}$/.test(hex))
-		throw new TypeError("Invalid hex color")
-
-	if (hex.length == 3)
-		return "#"
-			+ hex.split("")
-			.map(v => `${v}${v}`)
-			.join("")
-
-	return "#" + hex
-}
-
-
-/** Get a random hex color. */
-function randomColor() {
-	return "#" + Math.random().toString(16).slice(2, 8)
-}
-
-
-/** Play a pulse error animation on the options bar */
-function optionsBarError() {
-	optionsBar.classList.add("error")
-	optionsBar.addEventListener("animationend",
-		() => optionsBar.classList.remove("error"),
-		{ once: true }
-	)
-}
 
 
 

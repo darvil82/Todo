@@ -45,7 +45,7 @@ body {
   position: -webkit-sticky;
   position: sticky;
 }
-.options * {
+.options > * {
   margin-block: 0.1em;
 }
 .options.error {
@@ -54,12 +54,12 @@ body {
 }
 @-webkit-keyframes pulse {
   from {
-    background-color: rgba(100, 40, 40, 0.5);
+    background-color: #642828;
   }
 }
 @keyframes pulse {
   from {
-    background-color: rgba(100, 40, 40, 0.5);
+    background-color: #642828;
   }
 }
 
@@ -88,8 +88,8 @@ button {
   background-color: #252525;
   border: none;
   color: white;
-  font-size: 1em;
-  padding: 0.4em 1.75em;
+  font-size: 1.5em;
+  padding: 0.2em 1em;
   border-radius: 5px;
   font-weight: bold;
   transition: background-color 0.25s, box-shadow 1s, color 0.25s;
@@ -113,6 +113,14 @@ button.remove {
 button.select-all {
   --color-hover: rgb(216, 218, 99);
   --color-active: rgb(248, 243, 212);
+}
+button.import {
+  --color-hover: rgb(109, 219, 109);
+  --color-active: rgb(212, 243, 212);
+}
+button.export {
+  --color-hover: rgb(109, 109, 219);
+  --color-active: rgb(212, 212, 243);
 }
 
 .todos-container {
