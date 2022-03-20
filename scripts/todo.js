@@ -19,7 +19,7 @@ const opts = {
 };
 [];
 const defaultOptions = {
-    title: "",
+    title: "New Todo",
     body: "",
     date: new Date(),
     color: "#00CED1",
@@ -236,6 +236,10 @@ function downloadFile(filename, data) {
 }
 function exportTodos() {
     const todos = currentTodos.map(t => t.options);
+    if (!todos.length) {
+        optionsBarError();
+        return;
+    }
     downloadFile("todos.todos", JSON.stringify(todos));
 }
 function importTodos() {
@@ -331,11 +335,4 @@ if (!currentTodos.length) {
 		Oh yeah they get saved! (Well, unless you clear your cache or remove them)`
     });
 }
-// set up the "fancy" color picker
-document.querySelectorAll(".color-picker").forEach((picker) => {
-    const input = picker.firstElementChild;
-    const updateInput = () => picker.style.backgroundColor = input.value;
-    input.addEventListener("input", updateInput);
-    updateInput();
-});
 //# sourceMappingURL=todo.js.map
