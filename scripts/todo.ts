@@ -31,7 +31,7 @@ interface TodoInfo {
 	body?: string,
 	date?: Date | string,
 	color?: HEXColor
-}[]
+}
 
 const defaultOptions: TodoInfo = {
 	title: "New Todo",
