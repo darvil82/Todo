@@ -1,6 +1,7 @@
 // the color when the todos are selected
 $color-delete: rgb(177, 77, 77);
 $color-edit: rgb(182, 123, 56);
+$color-done: rgb(77, 177, 77);
 
 * {
 	scroll-behavior: smooth;
@@ -13,7 +14,7 @@ body {
 	scroll-behavior: smooth;
 	scroll-padding-top: 100px;
 	background-color: #000;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	color: white;
 	overflow-wrap: break-word;
 }
@@ -32,115 +33,107 @@ body {
 	background-color: rgb(82, 82, 82);
 }
 
-
-
-
 // these are the options shown the top
-	.options {
-		$bg-opacity: .5;
+.options {
+	$bg-opacity: 0.5;
 
-		padding: 1em;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		gap: .5em;
-		align-items: center;
-		top: 0;
-		z-index: 9999;
-		background-color: rgba(12, 12, 12, $bg-opacity);
-		backdrop-filter: blur(10px);
-		position: sticky;
+	padding: 1em;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5em;
+	align-items: center;
+	top: 0;
+	z-index: 9999;
+	background-color: rgba(12, 12, 12, $bg-opacity);
+	backdrop-filter: blur(10px);
+	position: sticky;
 
-		> * {
-			margin-block: .1em;
-		}
+	> * {
+		margin-block: 0.1em;
+	}
 
-		&.error {
-			animation: pulse 1s alternate;
+	&.error {
+		animation: pulse 1s alternate;
 
-			@keyframes pulse {
-				from {
-					background-color: rgb(100, 40, 40);
-				}
+		@keyframes pulse {
+			from {
+				background-color: rgb(100, 40, 40);
 			}
 		}
 	}
+}
 
-	input, .color-picker {
-		color: white;
-		font-size: .9em;
-		background-color: rgb(37, 37, 37);
-		border: none;
-		padding: .5em 1em;
-		border-radius: 5px;
-		box-shadow: inset 0 0 10px -2px black;
-		border: 1px solid rgb(43, 43, 43);
+input,
+.color-picker {
+	color: white;
+	font-size: 0.9em;
+	background-color: rgb(37, 37, 37);
+	border: none;
+	padding: 0.5em 1em;
+	border-radius: 5px;
+	box-shadow: inset 0 0 10px -2px black;
+	border: 1px solid rgb(43, 43, 43);
 
-		&.color-picker {
-			padding-inline: 0;
-		}
-
-		&[type=color] {
-			padding: 0;
-		}
-
-		input {
-			visibility: hidden;
-		}
+	&.color-picker {
+		padding-inline: 0;
 	}
 
-	button {
-		display: inline-block;
-		background-color: rgb(37, 37, 37);
-		border: none;
-		color: white;
-		font-size: 1.5em;
-		padding: 0.20em 1em;
-		border-radius: 5px;
-		font-weight: bold;
-		transition:
-			background-color 0.25s,
-			box-shadow 1s,
-			color 0.25s;
-
-		&:hover {
-			background-color: var(--color-hover, rgb(119, 219, 164));
-			box-shadow: 0 0 10px 1px rgba(36, 36, 36, 0.63);
-			color: black;
-			cursor: pointer;
-		}
-
-		&:active, &:focus-visible {
-			background-color: var(--color-active, rgb(206, 255, 228));
-			transition: 0.1s;
-			transform: scale(1.1);
-			color: black;
-		}
-
-
-		&.remove {
-			--color-hover: rgb(219, 109, 109);
-			--color-active: rgb(236, 218, 218);
-		}
-
-		&.select-all {
-			--color-hover: rgb(216, 218, 99);
-			--color-active: rgb(248, 243, 212);
-		}
-
-		&.import {
-			--color-hover: rgb(109, 219, 109);
-			--color-active: rgb(212, 243, 212);
-		}
-
-		&.export {
-			--color-hover: rgb(109, 109, 219);
-			--color-active: rgb(212, 212, 243);
-		}
+	&[type="color"] {
+		padding: 0;
 	}
 
+	input {
+		visibility: hidden;
+	}
+}
 
+button {
+	display: inline-block;
+	background-color: rgb(37, 37, 37);
+	border: none;
+	color: white;
+	font-size: 1.5em;
+	padding: 0.2em 1em;
+	border-radius: 5px;
+	font-weight: bold;
+	transition: background-color 0.25s, box-shadow 1s, color 0.25s;
 
+	&:hover {
+		background-color: var(--color-hover, rgb(119, 219, 164));
+		box-shadow: 0 0 10px 1px rgba(36, 36, 36, 0.63);
+		color: black;
+		cursor: pointer;
+	}
+
+	&:active,
+	&:focus-visible {
+		background-color: var(--color-active, rgb(206, 255, 228));
+		transition: 0.1s;
+		transform: scale(1.1);
+		color: black;
+	}
+
+	&.remove {
+		--color-hover: rgb(219, 109, 109);
+		--color-active: rgb(236, 218, 218);
+	}
+
+	&.select-all {
+		--color-hover: rgb(216, 218, 99);
+		--color-active: rgb(248, 243, 212);
+	}
+
+	&.import {
+		--color-hover: rgb(109, 219, 109);
+		--color-active: rgb(212, 243, 212);
+	}
+
+	&.export {
+		--color-hover: rgb(109, 109, 219);
+		--color-active: rgb(212, 212, 243);
+	}
+}
 
 // the element that contains all todos
 .todos-container {
@@ -153,14 +146,18 @@ body {
 
 .todo {
 	// how much distance the todo moves when shaking
-	--shake-anim-offset: .03em;
+	--shake-anim-offset: 0.03em;
 	$outline-size: 3px;
 
 	display: flex;
-	gap: .25em;
+	gap: 0.25em;
 	position: relative;
 	flex-direction: column;
-	background-image: linear-gradient(-150deg, #222, var(--bg-color, rgb(68, 202, 146)));
+	background-image: linear-gradient(
+		-150deg,
+		#222,
+		var(--bg-color, rgb(68, 202, 146))
+	);
 	background-size: 175%;
 	background-position: right;
 	box-shadow: inset 0 0 70px -5px rgba(0, 0, 0, 0.61);
@@ -173,11 +170,12 @@ body {
 	z-index: 1;
 	outline: 0 solid transparent;
 	user-select: none;
-	outline: $outline-size solid rgba(255, 255, 255, 0.040);
+	outline: $outline-size solid rgba(255, 255, 255, 0.04);
 	outline-offset: -$outline-size;
 
-	&, * {
-		transition: .5s;
+	&,
+	* {
+		transition: 0.5s;
 	}
 
 	.title {
@@ -187,7 +185,7 @@ body {
 
 	.date {
 		color: rgba(255, 255, 255, 0.267);
-		font-size: .75em;
+		font-size: 0.75em;
 		font-weight: bold;
 		margin-top: auto;
 		// align-self: flex-end;
@@ -203,21 +201,27 @@ body {
 		position: absolute;
 		bottom: 1em;
 		right: 1em;
-		top: calc(100% - 3em);
 		transform: translateY(200%);
-		transition: .5s;
-		// we dont want this button to be focusable now
+		transition: 0.5s;
 		visibility: hidden;
 	}
 
 	[contentEditable="true"] {
-		background-image: linear-gradient(90deg, var(--editable-color, rgba(0, 0, 0, 0.479)), transparent);
+		background-image: linear-gradient(
+			90deg,
+			var(--editable-color, rgba(0, 0, 0, 0.479)),
+			transparent
+		);
 		border-radius: 5px;
-		padding: .1em;
+		padding: 0.1em;
 	}
 
 	&.in {
-		animation: slide .5s forwards;
+		animation: slide 0.5s forwards;
+	}
+
+	&.done {
+		outline-color: $color-done;
 	}
 
 	&.selected {
@@ -240,11 +244,11 @@ body {
 	}
 
 	&.remove {
-		animation: slide .25s reverse forwards;
+		animation: slide 0.25s reverse forwards;
 	}
 
 	&.shake {
-		--shake-anim-offset: .25em;
+		--shake-anim-offset: 0.25em;
 		animation: shake 350ms alternate;
 
 		.title {
@@ -252,8 +256,8 @@ body {
 		}
 	}
 
-
-	&:hover, &:focus-visible {
+	&:hover,
+	&:focus-visible {
 		cursor: pointer;
 		background-position: left;
 
@@ -268,12 +272,16 @@ body {
 		position: absolute;
 		content: "";
 		inset: 0;
-		background-image: linear-gradient(320deg, transparent, rgba(0, 0, 0, 0.486));
+		background-image: linear-gradient(
+			320deg,
+			transparent,
+			rgba(0, 0, 0, 0.486)
+		);
 	}
 
 	@keyframes slide {
 		from {
-			transform: translateY(50%) scale(.25);
+			transform: translateY(50%) scale(0.25);
 			opacity: 0;
 		}
 	}
@@ -283,24 +291,25 @@ body {
 			transform: translate(0, var(--shake-anim-offset));
 		}
 		30% {
-			transform: translate(0, 0)
+			transform: translate(0, 0);
 		}
 		45% {
-			transform: translate(var(--shake-anim-offset), calc(var(--shake-anim-offset) * -1))
+			transform: translate(
+				var(--shake-anim-offset),
+				calc(var(--shake-anim-offset) * -1)
+			);
 		}
 		60% {
-			transform: translate(calc(var(--shake-anim-offset) * -1), 0)
+			transform: translate(calc(var(--shake-anim-offset) * -1), 0);
 		}
 		75% {
-			transform: translate(0, var(--shake-anim-offset))
+			transform: translate(0, var(--shake-anim-offset));
 		}
 		90% {
-			transform: translate(var(--shake-anim-offset), var(--shake-anim-offset))
+			transform: translate(var(--shake-anim-offset), var(--shake-anim-offset));
 		}
 	}
 }
-
-
 
 // please ignore this; it is extremely hacky and awful
 .github-label {
