@@ -137,6 +137,7 @@ button.export {
 
 .todo {
   --shake-anim-offset: 0.03em;
+  --blur-color: rgba(0, 0, 0, 0.486);
   display: flex;
   gap: 0.25em;
   position: relative;
@@ -168,12 +169,24 @@ button.export {
   font-size: 2.5em;
   font-weight: bold;
 }
-.todo .date {
+.todo .dates {
+  margin-top: auto;
+  padding-top: 1em;
+}
+.todo .dates .date-creation,
+.todo .dates .date-done {
+  display: block;
   color: rgba(255, 255, 255, 0.267);
   font-size: 0.75em;
   font-weight: bold;
-  margin-top: auto;
-  padding-top: 1em;
+  transition: 0.25s;
+}
+.todo .dates .date-done {
+  color: rgb(119, 219, 164);
+  visibility: hidden;
+  transform: translateY(100%);
+  opacity: 0;
+  position: absolute;
 }
 .todo .body {
   font-size: 1.25em;
@@ -187,6 +200,12 @@ button.export {
   transition: 0.5s;
   visibility: hidden;
 }
+.todo .done-btn {
+  position: absolute;
+  font-size: 1.2em;
+  bottom: 0.5em;
+  right: 0.5em;
+}
 .todo [contentEditable=true] {
   background-image: linear-gradient(90deg, var(--editable-color, rgba(0, 0, 0, 0.479)), transparent);
   border-radius: 5px;
@@ -197,7 +216,18 @@ button.export {
           animation: slide 0.5s forwards;
 }
 .todo.done {
-  outline-color: rgb(77, 177, 77);
+  outline-color: rgb(119, 219, 164);
+  --blur-color: rgba(28, 106, 63, 0.7);
+}
+.todo.done .done-btn {
+  background-color: rgb(119, 219, 164);
+  color: black;
+}
+.todo.done .date-done {
+  transform: translateY(0);
+  visibility: visible;
+  opacity: 1;
+  position: relative;
 }
 .todo.selected {
   outline-color: rgb(177, 77, 77);
@@ -215,6 +245,10 @@ button.export {
 .todo.edit .color-btn {
   transform: translateY(0);
   visibility: visible;
+}
+.todo.selected .done-btn, .todo.edit .done-btn {
+  transform: translateY(200%);
+  visibility: hidden;
 }
 .todo.remove {
   animation: slide 0.25s reverse forwards;
@@ -239,7 +273,7 @@ button.export {
   position: absolute;
   content: "";
   inset: 0;
-  background-image: linear-gradient(320deg, transparent, rgba(0, 0, 0, 0.486));
+  background-image: linear-gradient(320deg, transparent, var(--blur-color));
 }
 @-webkit-keyframes slide {
   from {

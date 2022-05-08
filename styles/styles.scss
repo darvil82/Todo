@@ -1,7 +1,9 @@
+@use "sass:color";
+
 // the color when the todos are selected
 $color-delete: rgb(177, 77, 77);
 $color-edit: rgb(182, 123, 56);
-$color-done: rgb(77, 177, 77);
+$color-done: rgb(119, 219, 164);
 
 * {
 	scroll-behavior: smooth;
@@ -147,6 +149,7 @@ button {
 .todo {
 	// how much distance the todo moves when shaking
 	--shake-anim-offset: 0.03em;
+	--blur-color: rgba(0, 0, 0, 0.486);
 	$outline-size: 3px;
 
 	display: flex;
@@ -183,13 +186,26 @@ button {
 		font-weight: bold;
 	}
 
-	.date {
-		color: rgba(255, 255, 255, 0.267);
-		font-size: 0.75em;
-		font-weight: bold;
+	.dates {
 		margin-top: auto;
-		// align-self: flex-end;
 		padding-top: 1em;
+
+		.date-creation,
+		.date-done {
+			display: block;
+			color: rgba(255, 255, 255, 0.267);
+			font-size: 0.75em;
+			font-weight: bold;
+			transition: 0.25s;
+		}
+
+		.date-done {
+			color: $color-done;
+			visibility: hidden;
+			transform: translateY(100%);
+			opacity: 0;
+			position: absolute;
+		}
 	}
 
 	.body {
@@ -204,6 +220,13 @@ button {
 		transform: translateY(200%);
 		transition: 0.5s;
 		visibility: hidden;
+	}
+
+	.done-btn {
+		position: absolute;
+		font-size: 1.2em;
+		bottom: 0.5em;
+		right: 0.5em;
 	}
 
 	[contentEditable="true"] {
@@ -222,6 +245,19 @@ button {
 
 	&.done {
 		outline-color: $color-done;
+		--blur-color: #{color.adjust($color-done, $lightness: -40, $alpha: -0.3)};
+
+		.done-btn {
+			background-color: $color-done;
+			color: black;
+		}
+
+		.date-done {
+			transform: translateY(0);
+			visibility: visible;
+			opacity: 1;
+			position: relative;
+		}
 	}
 
 	&.selected {
@@ -240,6 +276,14 @@ button {
 		.color-btn {
 			transform: translateY(0);
 			visibility: visible;
+		}
+	}
+
+	&.selected,
+	&.edit {
+		.done-btn {
+			transform: translateY(200%);
+			visibility: hidden;
 		}
 	}
 
@@ -272,11 +316,7 @@ button {
 		position: absolute;
 		content: "";
 		inset: 0;
-		background-image: linear-gradient(
-			320deg,
-			transparent,
-			rgba(0, 0, 0, 0.486)
-		);
+		background-image: linear-gradient(320deg, transparent, var(--blur-color));
 	}
 
 	@keyframes slide {

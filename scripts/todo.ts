@@ -27,7 +27,7 @@ const opts = {
 	),
 }
 
-type HEXColor = String
+type HEXColor = string
 
 /**
  * Data that a Todo holds
@@ -35,15 +35,19 @@ type HEXColor = String
 interface TodoInfo {
 	title?: string
 	body?: string
-	date?: Date | string
+	creationDate?: Date | string
+	doneDate?: Date | string
 	color?: HEXColor
+	done?: boolean
 }
 
 const defaultOptions: TodoInfo = {
 	title: "New Todo",
 	body: "",
-	date: new Date(),
+	creationDate: new Date(),
+	doneDate: new Date(),
 	color: "#00CED1",
+	done: false,
 }
 
 /**
@@ -58,6 +62,7 @@ class Todo {
 	private _isShown: boolean = false
 	private _isEditing: boolean = false
 	private _isSelected: boolean = false
+	private _isDone: boolean = false
 
 	constructor(options: TodoInfo) {
 		this.element = getTodoTemplate()
@@ -66,7 +71,10 @@ class Todo {
 			title: this.element.querySelector<HTMLSpanElement>(".title"),
 			body: this.element.querySelector<HTMLSpanElement>(".body"),
 			color: this.element.querySelector<HTMLSpanElement>(".color-btn"),
-			date: this.element.querySelector<HTMLSpanElement>(".date"),
+			creationDate:
+				this.element.querySelector<HTMLSpanElement>(".date-creation"),
+			doneDate: this.element.querySelector<HTMLSpanElement>(".date-done"),
+			done: this.element.querySelector<HTMLButtonElement>(".done-btn"),
 		}
 
 		this.setEvents()
@@ -115,6 +123,10 @@ class Todo {
 			},
 			{ once: true }
 		)
+		this.subElements.done.addEventListener("click", (e: Event) => {
+			this.toggleDone()
+			e.stopPropagation()
+		})
 	}
 
 	/**
@@ -183,7 +195,7 @@ class Todo {
 	}
 
 	/**
-	 * Update the todo using the data from the elements in it
+	 * Update the todo using the data from the elements in it, and save the todos
 	 */
 	private updateFromElements(): boolean {
 		const [title, body, color] = [
@@ -201,6 +213,9 @@ class Todo {
 		return true
 	}
 
+	/**
+	 * Shake the todo
+	 */
 	public shake() {
 		this.element.classList.add("shake")
 		this.element.addEventListener(
@@ -208,6 +223,16 @@ class Todo {
 			() => this.element.classList.remove("shake"),
 			{ once: true }
 		)
+	}
+
+	/**
+	 * Toggle whether the todo is done or not. This will inmediately save
+	 * all todos.
+	 * @param state The state to set the todo to
+	 */
+	public toggleDone(state?: boolean) {
+		if (state === this._isDone) return
+		this.update({ done: state ?? !this._isDone, doneDate: new Date() })
 	}
 
 	// -------------------- Setters --------------------
@@ -219,8 +244,12 @@ class Todo {
 		this.subElements.body.textContent = content.trim()
 	}
 
-	public set date(date: Date | string) {
-		this.subElements.date.textContent = date.toLocaleString()
+	public set creationDate(date: Date | string) {
+		this.subElements.creationDate.textContent = date.toLocaleString()
+	}
+
+	public set doneDate(date: Date | string) {
+		this.subElements.doneDate.textContent = date.toLocaleString()
 	}
 
 	public set color(color: string) {
@@ -229,12 +258,20 @@ class Todo {
 		this.subElements.color.value = color
 	}
 
+	public set done(done: boolean) {
+		this.element.classList.toggle("done", done)
+		this._isDone = done
+	}
+
 	// -------------------- Getters --------------------
 	public get options() {
 		// we need to make sure we save the date in the great format... Ugly!
 		return {
 			...this._options,
-			...{ date: this._options.date.toLocaleString() },
+			...{
+				creationDate: this._options.creationDate.toLocaleString(),
+				doneDate: this._options.doneDate.toLocaleString(),
+			},
 		}
 	}
 
@@ -244,6 +281,10 @@ class Todo {
 
 	public get isSelected() {
 		return this._isSelected
+	}
+
+	public get isDone() {
+		return this._isDone
 	}
 }
 
@@ -260,13 +301,13 @@ function addTodo(options: TodoInfo) {
 /**
  * Save the current todos to the local storage
  */
-function saveTodos() {
+const saveTodos = debounce(() => {
 	localStorage.setItem(
 		"todos",
 		JSON.stringify(currentTodos.map(t => t.options))
 	)
 	console.log("Saved todos: ", currentTodos)
-}
+})
 
 /**
  * Load the todos from the local storage and return them
@@ -278,7 +319,7 @@ function getTodos(): TodoInfo[] {
 /**
  * Check if a hex color is valid, and return it with a `#rrggbb` format.
  */
-function checkHexColor(hex: string): string {
+function checkHexColor(hex: HEXColor): HEXColor {
 	hex = hex.replaceAll("#", "").toLowerCase()
 
 	if (!/^([\da-f]{3}){1,2}$/.test(hex)) throw new TypeError("Invalid hex color")
@@ -412,12 +453,20 @@ function forEachTodo(
 	}
 
 	todos.forEach((t, i) =>
-		setTimeout(() => callback(t), i * (250 / todos.length))
+		setTimeout(() => {
+			callback(t)
+			if (save) saveTodos()
+		}, i * (250 / todos.length))
 	)
+}
 
-	if (save) {
-		// wait for all the todos to remove before saving
-		setTimeout(() => saveTodos(), todos.length * (250 / todos.length))
+function debounce(func: Function, delay: number = 500): Function {
+	let timer: number
+	return (...args: any[]) => {
+		clearTimeout(timer)
+		timer = setTimeout(() => {
+			func.apply(this, args)
+		}, delay)
 	}
 }
 

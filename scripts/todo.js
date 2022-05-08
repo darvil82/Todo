@@ -18,8 +18,10 @@ const opts = {
 const defaultOptions = {
     title: "New Todo",
     body: "",
-    date: new Date(),
+    creationDate: new Date(),
+    doneDate: new Date(),
     color: "#00CED1",
+    done: false,
 };
 /**
  * All the todos that we have in the container
@@ -32,6 +34,7 @@ class Todo {
     _isShown = false;
     _isEditing = false;
     _isSelected = false;
+    _isDone = false;
     constructor(options) {
         this.element = getTodoTemplate();
         this.element.tabIndex = 0;
@@ -39,7 +42,9 @@ class Todo {
             title: this.element.querySelector(".title"),
             body: this.element.querySelector(".body"),
             color: this.element.querySelector(".color-btn"),
-            date: this.element.querySelector(".date"),
+            creationDate: this.element.querySelector(".date-creation"),
+            doneDate: this.element.querySelector(".date-done"),
+            done: this.element.querySelector(".done-btn"),
         };
         this.setEvents();
         this.update({ ...defaultOptions, ...options }, false);
@@ -80,6 +85,10 @@ class Todo {
                 }
             });
         }, { once: true });
+        this.subElements.done.addEventListener("click", (e) => {
+            this.toggleDone();
+            e.stopPropagation();
+        });
     }
     /**
      * Show the todo in the container
@@ -136,7 +145,7 @@ class Todo {
         this.element.classList.toggle("selected", this._isSelected);
     }
     /**
-     * Update the todo using the data from the elements in it
+     * Update the todo using the data from the elements in it, and save the todos
      */
     updateFromElements() {
         const [title, body, color] = [
@@ -151,9 +160,22 @@ class Todo {
         this.update({ title, body, color });
         return true;
     }
+    /**
+     * Shake the todo
+     */
     shake() {
         this.element.classList.add("shake");
         this.element.addEventListener("animationend", () => this.element.classList.remove("shake"), { once: true });
+    }
+    /**
+     * Toggle whether the todo is done or not. This will inmediately save
+     * all todos.
+     * @param state The state to set the todo to
+     */
+    toggleDone(state) {
+        if (state === this._isDone)
+            return;
+        this.update({ done: state ?? !this._isDone, doneDate: new Date() });
     }
     // -------------------- Setters --------------------
     set title(content) {
@@ -162,20 +184,30 @@ class Todo {
     set body(content) {
         this.subElements.body.textContent = content.trim();
     }
-    set date(date) {
-        this.subElements.date.textContent = date.toLocaleString();
+    set creationDate(date) {
+        this.subElements.creationDate.textContent = date.toLocaleString();
+    }
+    set doneDate(date) {
+        this.subElements.doneDate.textContent = date.toLocaleString();
     }
     set color(color) {
         color = checkHexColor(color);
         this.element.style.setProperty("--bg-color", color);
         this.subElements.color.value = color;
     }
+    set done(done) {
+        this.element.classList.toggle("done", done);
+        this._isDone = done;
+    }
     // -------------------- Getters --------------------
     get options() {
         // we need to make sure we save the date in the great format... Ugly!
         return {
             ...this._options,
-            ...{ date: this._options.date.toLocaleString() },
+            ...{
+                creationDate: this._options.creationDate.toLocaleString(),
+                doneDate: this._options.doneDate.toLocaleString(),
+            },
         };
     }
     get isEditing() {
@@ -183,6 +215,9 @@ class Todo {
     }
     get isSelected() {
         return this._isSelected;
+    }
+    get isDone() {
+        return this._isDone;
     }
 }
 /**
@@ -198,10 +233,10 @@ function addTodo(options) {
 /**
  * Save the current todos to the local storage
  */
-function saveTodos() {
+const saveTodos = debounce(() => {
     localStorage.setItem("todos", JSON.stringify(currentTodos.map(t => t.options)));
     console.log("Saved todos: ", currentTodos);
-}
+});
 /**
  * Load the todos from the local storage and return them
  */
@@ -314,11 +349,20 @@ function forEachTodo(todos, callback, save = true) {
             saveTodos();
         return;
     }
-    todos.forEach((t, i) => setTimeout(() => callback(t), i * (250 / todos.length)));
-    if (save) {
-        // wait for all the todos to remove before saving
-        setTimeout(() => saveTodos(), todos.length * (250 / todos.length));
-    }
+    todos.forEach((t, i) => setTimeout(() => {
+        callback(t);
+        if (save)
+            saveTodos();
+    }, i * (250 / todos.length)));
+}
+function debounce(func, delay = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
 }
 // Import a file
 opts.importButton.addEventListener("click", () => importTodos());
