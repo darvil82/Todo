@@ -19,7 +19,6 @@ const defaultOptions = {
     title: "New Todo",
     body: "",
     creationDate: new Date(),
-    doneDate: new Date(),
     color: "#00CED1",
     done: false,
 };
@@ -173,9 +172,12 @@ class Todo {
      * @param state The state to set the todo to
      */
     toggleDone(state) {
+        state = state ?? !this._isDone;
         if (state === this._isDone)
             return;
-        this.update({ done: state ?? !this._isDone, doneDate: new Date() });
+        state
+            ? this.update({ done: state, doneDate: new Date() })
+            : this.update({ done: state });
     }
     // -------------------- Setters --------------------
     set title(content) {
@@ -206,7 +208,7 @@ class Todo {
             ...this._options,
             ...{
                 creationDate: this._options.creationDate.toLocaleString(),
-                doneDate: this._options.doneDate.toLocaleString(),
+                doneDate: this._options.doneDate?.toLocaleString(),
             },
         };
     }
@@ -219,16 +221,6 @@ class Todo {
     get isDone() {
         return this._isDone;
     }
-}
-/**
- * Inserts a Todo into the container
- * @param options The options of the Todo
- */
-function addTodo(options) {
-    if (!options.title.trim())
-        return false;
-    new Todo(options);
-    return true;
 }
 /**
  * Save the current todos to the local storage
@@ -301,7 +293,7 @@ function importTodos() {
                 const todos = JSON.parse(data);
                 if (!Array.isArray(todos))
                     return;
-                todos.forEach(t => addTodo(t));
+                todos.forEach(t => new Todo(t));
                 saveTodos();
             }
             catch (e) {
@@ -316,7 +308,7 @@ function importTodos() {
 }
 // Handle the "Add" button
 opts.addButton.addEventListener("click", () => {
-    addTodo({
+    new Todo({
         title: "New Todo",
         color: randomColor(),
     });
@@ -369,11 +361,11 @@ opts.importButton.addEventListener("click", () => importTodos());
 // Export a file
 opts.exportButton.addEventListener("click", () => exportTodos());
 // Insert the todos from the local storage
-getTodos().forEach(options => addTodo(options));
+getTodos().forEach(options => new Todo(options));
 saveTodos();
 // If we have no todos, add the default one
 if (!currentTodos.length) {
-    addTodo({
+    new Todo({
         title: "Another note",
         body: `Do you want to edit a Todo? Cool! Just double click on it to
 		enable the edit mode. Once finished, double click again!
@@ -381,7 +373,7 @@ if (!currentTodos.length) {
 		it, and "Escape" to edit it.`,
         color: "#483cb5",
     });
-    addTodo({
+    new Todo({
         title: "Welcome to my Todos!",
         body: `So, yeah... This is a Todo! You can add,
 		remove, and edit them! That's pretty much it I guess...

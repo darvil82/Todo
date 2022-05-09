@@ -194,8 +194,8 @@ button.export {
 }
 .todo .color-btn {
   position: absolute;
-  bottom: 1em;
-  right: 1em;
+  bottom: 0.75em;
+  right: 0.75em;
   transform: translateY(200%);
   transition: 0.5s;
   visibility: hidden;
