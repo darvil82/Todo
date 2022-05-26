@@ -27,23 +27,23 @@ const defaultOptions = {
  */
 const currentTodos = [];
 class Todo {
-    element;
+    _element;
     _options; // this needs to be private because options should only be changed by the update method
-    subElements = {};
+    _subElements = {};
     _isShown = false;
     _isEditing = false;
     _isSelected = false;
     _isDone = false;
     constructor(options) {
-        this.element = getTodoTemplate();
-        this.element.tabIndex = 0;
-        this.subElements = {
-            title: this.element.querySelector(".title"),
-            body: this.element.querySelector(".body"),
-            color: this.element.querySelector(".color-btn"),
-            creationDate: this.element.querySelector(".date-creation"),
-            doneDate: this.element.querySelector(".date-done"),
-            done: this.element.querySelector(".done-btn"),
+        this._element = getTodoTemplate();
+        this._element.tabIndex = 0;
+        this._subElements = {
+            title: this._element.querySelector(".title"),
+            body: this._element.querySelector(".body"),
+            color: this._element.querySelector(".color-btn"),
+            creationDate: this._element.querySelector(".date-creation"),
+            doneDate: this._element.querySelector(".date-done"),
+            done: this._element.querySelector(".done-btn"),
         };
         this.setEvents();
         this.update({ ...defaultOptions, ...options }, false);
@@ -64,19 +64,19 @@ class Todo {
      */
     setEvents() {
         // we want to add the events when the show animation finishes
-        this.element.addEventListener("animationend", () => {
-            this.element.addEventListener("click", () => this.toggleSelect());
-            this.element.addEventListener("keydown", (e) => {
+        this._element.addEventListener("animationend", () => {
+            this._element.addEventListener("click", () => this.toggleSelect());
+            this._element.addEventListener("keydown", (e) => {
                 if (e.key == "Enter")
                     this.toggleSelect();
                 if (e.key == "Escape")
                     this.toggleEdit();
             });
-            this.element.addEventListener("dblclick", () => this.toggleEdit());
+            this._element.addEventListener("dblclick", () => this.toggleEdit());
             // Exit editing when the user presses the enter key in the input
             document.addEventListener("keydown", (event) => {
-                if ((event.target === this.subElements.title ||
-                    event.target === this.subElements.body) &&
+                if ((event.target === this._subElements.title ||
+                    event.target === this._subElements.body) &&
                     event.key === "Enter") {
                     this.toggleEdit();
                     // we don't want the user to input newlines
@@ -84,7 +84,7 @@ class Todo {
                 }
             });
         }, { once: true });
-        this.subElements.done.addEventListener("click", (e) => {
+        this._subElements.done.addEventListener("click", (e) => {
             this.toggleDone();
             e.stopPropagation();
         });
@@ -94,22 +94,22 @@ class Todo {
      */
     show() {
         // play the animation and then remove the animation class after it's done
-        this.element.classList.add("in");
-        this.element.addEventListener("animationend", () => {
-            this.element.classList.remove("in");
+        this._element.classList.add("in");
+        this._element.addEventListener("animationend", () => {
+            this._element.classList.remove("in");
             this._isShown = true;
         }, { once: true });
         // add the element to the container with all the todos
-        container.prepend(this.element);
+        container.prepend(this._element);
     }
     /**
      * Remove the todo
      */
     remove() {
-        this.element.classList.add("remove");
+        this._element.classList.add("remove");
         currentTodos.splice(currentTodos.indexOf(this), 1);
         // dont remove until "remove" animation ends
-        this.element.addEventListener("animationend", () => this.element.remove(), {
+        this._element.addEventListener("animationend", () => this._element.remove(), {
             once: true,
         });
     }
@@ -126,13 +126,13 @@ class Todo {
          */
         if (this._isEditing && !state && !this.updateFromElements())
             return;
-        this._isEditing = state ?? !this._isEditing;
-        // remove the selected state
+        // make sure we remove the selected state
         this.toggleSelect(false);
-        this.element.classList.toggle("edit", this._isEditing);
-        [this.subElements.title, this.subElements.body].forEach(e => (e.contentEditable = this._isEditing ? "true" : "false"));
-        this.subElements.color.disabled = !this._isEditing;
-        this.subElements.title.focus();
+        this._isEditing = state ?? !this._isEditing;
+        this._element.classList.toggle("edit", this._isEditing);
+        [this._subElements.title, this._subElements.body].forEach(e => (e.contentEditable = this._isEditing ? "true" : "false"));
+        this._subElements.color.disabled = !this._isEditing;
+        this._subElements.title.focus();
     }
     /**
      * Toggle the todo selection
@@ -141,16 +141,16 @@ class Todo {
         if (this._isEditing || !this._isShown)
             return;
         this._isSelected = state ?? !this._isSelected;
-        this.element.classList.toggle("selected", this._isSelected);
+        this._element.classList.toggle("selected", this._isSelected);
     }
     /**
      * Update the todo using the data from the elements in it, and save the todos
      */
     updateFromElements() {
         const [title, body, color] = [
-            this.subElements.title.textContent.trim(),
-            this.subElements.body.textContent.trim(),
-            this.subElements.color.value,
+            this._subElements.title.textContent.trim(),
+            this._subElements.body.textContent.trim(),
+            this._subElements.color.value,
         ];
         if (!title) {
             this.shake();
@@ -163,8 +163,8 @@ class Todo {
      * Shake the todo
      */
     shake() {
-        this.element.classList.add("shake");
-        this.element.addEventListener("animationend", () => this.element.classList.remove("shake"), { once: true });
+        this._element.classList.add("shake");
+        this._element.addEventListener("animationend", () => this._element.classList.remove("shake"), { once: true });
     }
     /**
      * Toggle whether the todo is done or not. This will inmediately save
@@ -181,24 +181,24 @@ class Todo {
     }
     // -------------------- Setters --------------------
     set title(content) {
-        this.subElements.title.textContent = content.trim();
+        this._subElements.title.textContent = content.trim();
     }
     set body(content) {
-        this.subElements.body.textContent = content.trim();
+        this._subElements.body.textContent = content.trim();
     }
     set creationDate(date) {
-        this.subElements.creationDate.textContent = date.toLocaleString();
+        this._subElements.creationDate.textContent = date.toLocaleString();
     }
     set doneDate(date) {
-        this.subElements.doneDate.textContent = date.toLocaleString();
+        this._subElements.doneDate.textContent = date.toLocaleString();
     }
     set color(color) {
         color = checkHexColor(color);
-        this.element.style.setProperty("--bg-color", color);
-        this.subElements.color.value = color;
+        this._element.style.setProperty("--bg-color", color);
+        this._subElements.color.value = color;
     }
     set done(done) {
-        this.element.classList.toggle("done", done);
+        this._element.classList.toggle("done", done);
         this._isDone = done;
     }
     // -------------------- Getters --------------------
@@ -306,21 +306,6 @@ function importTodos() {
     input.click();
     input.remove();
 }
-// Handle the "Add" button
-opts.addButton.addEventListener("click", () => {
-    new Todo({
-        title: "New Todo",
-        color: randomColor(),
-    });
-    scrollTo(0, 0);
-    saveTodos();
-});
-// Remove all the selected todos
-opts.delButton.addEventListener("click", () => forEachTodo(currentTodos.filter(t => t.isSelected), t => t.remove()));
-// Toggle the selected class of all the todos
-opts.allButton.addEventListener("click", () => 
-// slice the array to prevent its mutation
-forEachTodo(currentTodos.slice().reverse(), t => t.toggleSelect(), false));
 /**
  * Call a callback for each Todo.
  * - If there are no todos, the options bar will show the error animation.
@@ -356,28 +341,46 @@ function debounce(func, delay = 500) {
         }, delay);
     };
 }
-// Import a file
-opts.importButton.addEventListener("click", () => importTodos());
-// Export a file
-opts.exportButton.addEventListener("click", () => exportTodos());
-// Insert the todos from the local storage
-getTodos().forEach(options => new Todo(options));
-saveTodos();
-// If we have no todos, add the default one
-if (!currentTodos.length) {
-    new Todo({
-        title: "Another note",
-        body: `Do you want to edit a Todo? Cool! Just double click on it to
-		enable the edit mode. Once finished, double click again!
-		If you prefer using the keyboard, that's fine! Press "Enter" to select
-		it, and "Escape" to edit it.`,
-        color: "#483cb5",
+;
+(function main() {
+    // Handle import file button
+    opts.importButton.addEventListener("click", () => importTodos());
+    // Handle export file button
+    opts.exportButton.addEventListener("click", () => exportTodos());
+    // Handle the "Add" button
+    opts.addButton.addEventListener("click", () => {
+        new Todo({
+            title: "New Todo",
+            color: randomColor(),
+        });
+        scrollTo(0, 0);
+        saveTodos();
     });
-    new Todo({
-        title: "Welcome to my Todos!",
-        body: `So, yeah... This is a Todo! You can add,
-		remove, and edit them! That's pretty much it I guess...
-		Oh yeah they get saved! (Well, unless you clear your cache or remove them)`,
-    });
-}
+    // Remove all the selected todos
+    opts.delButton.addEventListener("click", () => forEachTodo(currentTodos.filter(t => t.isSelected), t => t.remove()));
+    // Toggle the selected class of all the todos
+    opts.allButton.addEventListener("click", () => 
+    // slice the array to prevent its mutation
+    forEachTodo(currentTodos.slice().reverse(), t => t.toggleSelect(), false));
+    // Insert the todos from the local storage
+    getTodos().forEach(options => new Todo(options));
+    saveTodos();
+    // If we have no todos, add the default ones
+    if (!currentTodos.length) {
+        new Todo({
+            title: "Another note",
+            body: `Do you want to edit a Todo? Cool! Just double click on it to
+				enable the edit mode. Once finished, double click again!
+				If you prefer using the keyboard, that's fine! Press "Enter" to select
+				it, and "Escape" to edit it.`,
+            color: "#483cb5",
+        });
+        new Todo({
+            title: "Welcome to my Todos!",
+            body: `So, yeah... This is a Todo! You can add,
+				remove, and edit them! That's pretty much it I guess...
+				Oh yeah they get saved! (Well, unless you clear your cache or remove them)`,
+        });
+    }
+})();
 //# sourceMappingURL=todo.js.map

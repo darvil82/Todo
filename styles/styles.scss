@@ -15,7 +15,7 @@ $color-done: rgb(119, 219, 164);
 body {
 	scroll-behavior: smooth;
 	scroll-padding-top: 100px;
-	background-color: #000;
+	background-color: black;
 	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 	color: white;
 	overflow-wrap: break-word;
@@ -101,7 +101,8 @@ button {
 	font-weight: bold;
 	transition: background-color 0.25s, box-shadow 1s, color 0.25s;
 
-	&:hover {
+	&:hover,
+	.highlight {
 		background-color: var(--color-hover, rgb(119, 219, 164));
 		box-shadow: 0 0 10px 1px rgba(36, 36, 36, 0.63);
 		color: black;
@@ -321,7 +322,7 @@ button {
 
 	@keyframes slide {
 		from {
-			transform: translateY(50%) scale(0.25);
+			transform: translateY(50%) scale(0.25) rotateY(90deg);
 			opacity: 0;
 		}
 	}
